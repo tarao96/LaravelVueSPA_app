@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      TZ: Asia/Tokyo
+    ports:
+      - 80:80
+
+  database:
+    container_name: db
+    build:
+      context: .
+      dockerfile: docker/db/Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel_vue_todo
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - docker-db-mysql:/var/lib/mysql
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOSTS=via_database
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    ports:
+      - 8080:80
+
+volumes:
+  docker-db-mysql:
